@@ -1,0 +1,9 @@
+version: '3'
+services:
+  svelte-app:
+    build: .
+    container_name: TVLeo2 
+    restart: unless-stopped
+    expose:
+      - "3000"
+
