@@ -1,17 +1,17 @@
-FROM node:20
+FROM node:22-alpine
 
 # Crée un dossier de travail
 WORKDIR /app
 
 # Copie les fichiers du projet
-COPY app/ ./
+COPY ./ ./
 
 # Installe les dépendances et build l'app
-RUN npm install && npm run build
+RUN yarn install && yarn run build
 
 # Expose le port
 EXPOSE 3000
 
 # Lance le serveur SvelteKit (production)
-CMD ["node", "build"]
+CMD ["yarn", "preview", "--port", "3000", "--host"]
 
