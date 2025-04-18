@@ -14,6 +14,7 @@ export const load = async ({ locals }: {locals: localsType}) => {
 	};
 }
 
+/*
 export const actions = {
 	default: async ({ cookies, request }) => {
 		console.log("login");
@@ -31,8 +32,8 @@ export const actions = {
 			return fail(400, { message: "invalid" });
 
 	},
-};
-/*
+};*/
+/**
 export async function POST({request, cookies}){
 	const { password } = await request.json();
 
@@ -47,4 +48,5 @@ export async function POST({request, cookies}){
 	return new Response(JSON.stringify({error: "wrong password"}), { status: 401 });
 
 
-}*/
+}
+*/

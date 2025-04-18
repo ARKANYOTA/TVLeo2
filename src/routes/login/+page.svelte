@@ -3,6 +3,28 @@
 	const { isAdmin } = data;
 	import { enhance} from '$app/forms';
 
+	async function logined(e: Event) {
+		e.preventDefault();
+		const response = await fetch('/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ password: document.getElementById('password')?.value })
+		});
+		console.log(response);
+		if (response.ok) {
+			const login_response = await response.json();
+			console.log('Login successful', login_response);
+			if (login_response.success) {
+				window.location.href = '/admin';
+			} else {
+				alert('Login failed');
+			}
+		} else {
+			alert('Login failed');
+		}
+	}
 
 </script>
 <div>
@@ -15,7 +37,7 @@
 {:else}
 	<div>
 		<h1>Login</h1>
-		<form method="POST" action="/login" use:enhance>
+		<form method="POST" on:submit|preventDefault={logined} id="form-data">
 			<label for="password">Password:</label>
 			<input type="password" id="password" name="password" required>
 			<br>
