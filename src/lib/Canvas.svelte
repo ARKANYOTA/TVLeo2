@@ -32,6 +32,7 @@
 			ctx.fillStyle = colors[eraserColor];
 		}
 		if(brushSize === 1){
+			if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) return;
 			ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
 			if(leftButton) {
 				pixels[y][x] = selectedColor;
@@ -41,6 +42,7 @@
 		} else {
 			for (let i = -Math.floor(brushSize / 2); i <= Math.floor(brushSize / 2); i++) {
 				for (let j = -Math.floor(brushSize / 2); j <= Math.floor(brushSize / 2); j++) {
+					if(x + i < 0 || x + i >= pixelWidth || y + j < 0 || y + j >= pixelHeight) continue;
 					ctx.fillRect((x + i) * pixelSize, (y + j) * pixelSize, pixelSize, pixelSize);
 					if(leftButton) {
 						pixels[y+j][x+i] = selectedColor;
