@@ -46,8 +46,9 @@
 						const Colorindex = closestColorIndex([r, g, b]);
 
 						bytes += indexs[Colorindex];
-						onUpdate(bytes);
 					}
+					console.log(bytes);
+					onUpdate(bytes);
 				});
 
 

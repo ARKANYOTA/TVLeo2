@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { colors, pixelHeight, pixelSize, pixelWidth, eraserColor, indexs } from "$lib/consts";
+	import { colors, eraserColor, indexs, pixelHeight, pixelSize, pixelWidth } from '$lib/consts';
 	import UploadImage from '$lib/UploadImage.svelte';
 
 	let canvas: HTMLCanvasElement;
@@ -171,7 +171,7 @@
 	function change_bytes(bytes: string) {
 		for (let i = 0; i < pixelHeight; i++) {
 			for (let j = 0; j < pixelWidth; j++) {
-				pixels[currentFrame][i][j] = parseInt(bytes[i * pixelWidth + j]);
+				pixels[currentFrame][i][j] = indexs.indexOf(bytes[i * pixelWidth + j]);
 			}
 		}
 		load_pixels();
