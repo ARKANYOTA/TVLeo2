@@ -1,4 +1,15 @@
 services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: opc
+      POSTGRES_PASSWORD: RvV8ApkBOdwqg6Hk2ZunRiN0
+      POSTGRES_DB: tvleo
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+
   tvleo2:
     build: .
     container_name: TVLeo2
@@ -6,6 +17,11 @@ services:
       - "3000:3000"  # Expose uniquement le port 3000 pour ton app
     expose:
       - "3000"
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+
 # 
         # services:
         #   svelte-app:
@@ -15,3 +31,7 @@ services:
         #     expose:
         #       - "3000"
         # 
+networks:
+  mynetwork:
+    driver: bridge
+
