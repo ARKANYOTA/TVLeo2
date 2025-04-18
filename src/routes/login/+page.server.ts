@@ -1,9 +1,22 @@
 import { ADMIN_PASSWORD } from '$env/static/private';
 
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import type { localsType } from '$lib/types';
+
+export const load = async ({ locals }: {locals: localsType}) => {
+	if (locals.admin) {
+		return {
+			isAdmin: true,
+		};
+	}
+	return {
+		isAdmin: false,
+	};
+}
 
 export const actions = {
 	default: async ({ cookies, request }) => {
+		console.log("login");
 			const data = await request.formData();
 			const password = data.get('password');
 			if (!password) return fail(400, { message: "invalid" });
@@ -12,7 +25,8 @@ export const actions = {
 				cookies.set("admin_password", password, {
 					path: '/'
 				})
-				return {success: true};
+				return redirect(302, '/admin');
+				// return {success: true};
 			}
 			return fail(400, { message: "invalid" });
 
