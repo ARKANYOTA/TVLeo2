@@ -7,6 +7,9 @@
 	const { isAdmin } = data;
 
 	let liste: undefined | Array<any> = $state(undefined);
+	let selectedImage: undefined | string = $state(undefined);
+	let frames: number = $state(1);
+	let currentFrame: number = $state(0);
 
 	onMount(() => {
 		load_list();
@@ -23,7 +26,6 @@
 		if (response.ok) {
 			const liste_response = await response.json();
 			liste = liste_response.liste;
-			console.log(liste);
 		} else {
 			console.error('Failed to load list');
 		}
@@ -42,8 +44,11 @@
 			body: JSON.stringify({})
 		});
 		if (response.ok) {
+			selectedImage = id;
 			const image_response = await response.json();
 			const image = image_response.image;
+			frames = image.bytes.length;
+			currentFrame = 0;
 			bytes = image.bytes;
 			change_bytes();
 		} else {
@@ -55,7 +60,7 @@
 
 	function change_bytes() {
 		// Force pour comprendre: https://stackoverflow.com/questions/58287729/how-can-i-export-a-function-from-a-svelte-component-that-changes-a-value-in-the
-		change_bytes_Component.change_bytes(bytes);
+		change_bytes_Component.change_bytes(bytes[currentFrame]);
 	}
 
 	async function approve_image(id: string) {
@@ -67,7 +72,6 @@
 			body: JSON.stringify({})
 		});
 		if (response.ok) {
-			console.log('Image approved');
 			load_list();
 		} else {
 			console.error('Failed to approve image');
@@ -83,7 +87,6 @@
 			body: JSON.stringify({})
 		});
 		if (response.ok) {
-			console.log('Image deleted');
 			load_list();
 		} else {
 			console.error('Failed to delete image');
@@ -94,6 +97,7 @@
 
 <div>
 	{#if isAdmin}
+		{frames}
 		<input type="checkbox" bind:checked={onlyApproved} id="onlyApproved">
 		<label for="onlyApproved">Only show approved</label>
 
@@ -105,8 +109,14 @@
 		{#if liste}
 			<ul>
 				{#each liste as img}
-					<li>{img.id} - {img.name} - {img.description} -
-						<button onclick={() => get_image(img.id)}>Get Image</button>
+					<li>
+						{#if selectedImage === img.id}
+						 	Selected image:
+						{/if}
+						{#if selectedImage !== img.id}
+							<button onclick={() => get_image(img.id)}>Get Image</button>
+						{/if}
+						{img.id} - {img.name} - {img.description} -
 						{#if !img.approved}
 							<button onclick={() => approve_image(img.id)}>A</button>
 						{/if}
@@ -123,6 +133,12 @@
 		<br/>
 
 		<RenderCanvas bind:this={change_bytes_Component} />
+		{#each { length : frames } as _, i}
+			<button onclick={() => {
+				currentFrame = i;
+				change_bytes();
+			}}>Frame {i}</button>
+		{/each}
 
 
 

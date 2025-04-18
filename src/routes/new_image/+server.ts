@@ -17,7 +17,5 @@ export async function POST({ request }){
 			}
 		})
 
-	console.log(out)
-
 	return new Response(JSON.stringify({message: "ok"}), {status: 200})
 }

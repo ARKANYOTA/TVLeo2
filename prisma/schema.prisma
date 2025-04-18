@@ -10,9 +10,9 @@ generator client {
 }
 
 model Image {
-  id          String  @id @default(uuid())
-  bytes       String
+  id          String   @id @default(uuid())
+  bytes       String[]
   name        String
   description String
-  approved    Boolean @default(false)
+  approved    Boolean  @default(false)
 }

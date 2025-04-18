@@ -12,10 +12,8 @@
 			},
 			body: JSON.stringify({ password: document.getElementById('password')?.value })
 		});
-		console.log(response);
 		if (response.ok) {
 			const login_response = await response.json();
-			console.log('Login successful', login_response);
 			if (login_response.success) {
 				window.location.href = '/admin';
 			} else {

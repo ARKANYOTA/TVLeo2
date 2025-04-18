@@ -9,13 +9,44 @@
 
 	let brushSize = 1;
 
+	let currentFrame = 0;
+	let frames = 1;
+
 	// Crée un tableau de pixels
-	const pixels: number[][] = [];
+	const pixels: number[][][] = [[]];
 	for (let i = 0; i < pixelHeight; i++) {
-		pixels[i] = [];
+		pixels[currentFrame][i] = [];
 		for (let j = 0; j < pixelWidth; j++) {
-			pixels[i][j] = 0;
+			pixels[currentFrame][i][j] = 0;
 		}
+	}
+
+	function new_frame() {
+		// Crée un tableau de pixels
+		pixels[frames] = [];
+		for (let i = 0; i < pixelHeight; i++) {
+			pixels[frames][i] = [];
+			for (let j = 0; j < pixelWidth; j++) {
+				pixels[frames][i][j] = 0;
+			}
+		}
+		frames++;
+		currentFrame = frames - 1;
+		load_pixels();
+	}
+
+	function copy_frame() {
+		// Crée un tableau de pixels
+		pixels[frames] = [];
+		for (let i = 0; i < pixelHeight; i++) {
+			pixels[frames][i] = [];
+			for (let j = 0; j < pixelWidth; j++) {
+				pixels[frames][i][j] = pixels[currentFrame][i][j];
+			}
+		}
+		frames++;
+		currentFrame = frames - 1;
+		load_pixels();
 	}
 
 	function drawListener(e: MouseEvent) {
@@ -35,9 +66,10 @@
 			if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) return;
 			ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
 			if(leftButton) {
-				pixels[y][x] = selectedColor;
+
+				pixels[currentFrame][y][x] = selectedColor;
 			} else if (rightButton) {
-				pixels[y][x] = 0;
+				pixels[currentFrame][y][x] = 0;
 			}
 		} else {
 			for (let i = -Math.floor(brushSize / 2); i <= Math.floor(brushSize / 2); i++) {
@@ -45,9 +77,9 @@
 					if(x + i < 0 || x + i >= pixelWidth || y + j < 0 || y + j >= pixelHeight) continue;
 					ctx.fillRect((x + i) * pixelSize, (y + j) * pixelSize, pixelSize, pixelSize);
 					if(leftButton) {
-						pixels[y+j][x+i] = selectedColor;
+						pixels[currentFrame][y+j][x+i] = selectedColor;
 					} else if (rightButton) {
-						pixels[y+j][x+i] = 0;
+						pixels[currentFrame][y+j][x+i] = 0;
 					}
 				}
 			}
@@ -60,7 +92,7 @@
 		for (let i = 0; i < pixelHeight; i++) {
 			for (let j = 0; j < pixelWidth; j++) {
 				// pixels[i][j] = Math.floor(Math.random() * 2);
-				ctx.fillStyle = colors[pixels[i][j]];
+				ctx.fillStyle = colors[pixels[currentFrame][i][j]];
 				ctx.fillRect(j * pixelSize, i * pixelSize, pixelSize, pixelSize);
 			}
 		}
@@ -87,7 +119,7 @@
 	});
 
 	function upload_image() {
-		let pixels_str = pixels.map(row => row.map(pixel => indexs[pixel]).join("")).join("");
+		let pixels_str = pixels.map(frame => frame.map(row => row.map(pixel => indexs[pixel]).join("")).join(""));
 		fetch("/new_image", {
 			method: "POST",
 			headers: {
@@ -129,8 +161,24 @@
 	<label for="brushSize">Brush Size:</label>
 	<input type="number" id="brushSize" bind:value={brushSize} min="1" max="10">
 
+<br />
+{#each { length: frames } as _, i}
+	<button on:click={() => {
+		currentFrame = i;
+		load_pixels();
+	}}
+					class={currentFrame === i ? "selected" : ""}
+	>Frame {i}</button>
+{/each}
+
+	<button on:click={new_frame}>New Frame</button>
+  <button on:click={copy_frame}>copy current frame</button>
 <style>
 	canvas {
 		border: 1px solid black;
+	}
+
+	.selected {
+		background-color: #ccc;
 	}
 </style>

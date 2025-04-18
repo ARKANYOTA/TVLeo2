@@ -8,7 +8,6 @@ export async function GET(){
 		}
 	});
 
-	console.log("nb images", nb_images);
 	const random = Math.floor(Math.random() * nb_images);
 
 	const image = await prisma.image.findFirst({
@@ -20,7 +19,11 @@ export async function GET(){
 
 	if (!image) return new Response(JSON.stringify({error: "no image"}), {status: 400});
 
-	const { id, name, description } = image;
+	const { id, name, description, bytes } = image;
+
+	return new Response(JSON.stringify({id, frames: bytes.length}), {status: 200});
+
+	/*
 	const bytes = image.bytes;
 	const out = {
 		id,
@@ -28,7 +31,7 @@ export async function GET(){
 		description,
 		bytes,
 	};
-	const pngBuffer = create_image(bytes);
+	const pngBuffer = create_image(bytes[0]);
 
 	return new Response(pngBuffer, {
 		status: 200,
@@ -38,5 +41,5 @@ export async function GET(){
 			'Cache-Control': 'no-store',
 		},
 	})
-	return new Response(JSON.stringify({img: create_image(bytes)}), {status: 200});
+	// return new Response(JSON.stringify({img: create_image(bytes)}), {status: 200});*/
 }
