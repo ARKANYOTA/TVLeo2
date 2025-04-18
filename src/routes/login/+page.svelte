@@ -1,6 +1,7 @@
 <script lang="ts">
 	const { data } = $props();
 	const { isAdmin } = data;
+	import { enhance} from '$app/forms';
 
 
 </script>
@@ -14,7 +15,7 @@
 {:else}
 	<div>
 		<h1>Login</h1>
-		<form method="POST" action="/login">
+		<form method="POST" action="/login" use:enhance>
 			<label for="password">Password:</label>
 			<input type="password" id="password" name="password" required>
 			<br>
