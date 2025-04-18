@@ -850,11 +850,6 @@ callsites@^3.0.0:
   resolved "https://registry.npmjs.org/callsites/-/callsites-3.1.0.tgz"
   integrity sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==
 
-canvas-size@^1.2.6:
-  version "1.2.6"
-  resolved "https://registry.npmjs.org/canvas-size/-/canvas-size-1.2.6.tgz"
-  integrity sha512-x2iVHOrZ5x9V0Hwx6kBz+Yxf/VCAII+jrD6WLjJbytJLozHq/oDJjEva432Os0eHxWMFR0vYlLJwTr6QxyxQqw==
-
 canvas@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/canvas/-/canvas-3.1.0.tgz#6cdf094b859fef8e39b0e2c386728a376f1727b2"
@@ -1467,11 +1462,6 @@ hasown@^2.0.2:
   integrity sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==
   dependencies:
     function-bind "^1.1.2"
-
-hit-canvas@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.npmjs.org/hit-canvas/-/hit-canvas-0.2.3.tgz"
-  integrity sha512-B9g7xsqu+gOt1S0b/IwMuCrskumPX7jILDKAPP96iW8F3eJFU7v87+e8N4jOEstY2vcpJzsG1cmiMkiwaaEM3Q==
 
 html-encoding-sniffer@^4.0.0:
   version "4.0.0"
@@ -2203,15 +2193,6 @@ supports-color@^7.1.0:
   integrity sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
   dependencies:
     has-flag "^4.0.0"
-
-svelte-canvas@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/svelte-canvas/-/svelte-canvas-2.0.2.tgz#0f8c1266f4ca64fa8e553802b4b548cb6f778e7e"
-  integrity sha512-316P22Dt/+A6vW9mLzW4/DjMJ/H1B3r8R7n3SBe0kaq5hWWfZwdNJCBdS2myvjs7y5c9meHxo4d+Ipsz2Rbcqw==
-  dependencies:
-    canvas-size "^1.2.6"
-    hit-canvas "^0.2.3"
-    svelte "^5.0.0"
 
 svelte-check@^4.0.0:
   version "4.1.5"
