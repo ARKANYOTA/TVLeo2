@@ -48,6 +48,30 @@ export function create_image(bytes: string){
 		});
 	} else {
 		return res.status(400).json({ message: "Invalid data format" });
-	}
 */
+}
+
+export function create_images(bytes_arr: Array<string>){
+	// Console log the received data
+	const canvas = createCanvas(pixelWidth*bytes_arr.length, pixelHeight);
+	// createCanvas(pixelWidth, pixelHeight);
+	const ctx = canvas.getContext("2d");
+
+	ctx.fillStyle = "white";
+	ctx.fillRect(0,0, pixelWidth*bytes_arr.length, pixelHeight);
+
+	for (let j = 0; j < bytes_arr.length; j++) {
+		const bytes = bytes_arr[j];
+
+		for (let i = 0; i < bytes.length; i++) {
+			const c = bytes.charAt(i);
+			const index = indexs.indexOf(c);
+			ctx.fillStyle = colors[index];
+
+			var y = Math.floor(i / pixelWidth) ;
+			var x = i % pixelWidth + j * pixelWidth;
+			ctx.fillRect(x, y, 1,1);
+		}
+	}
+	return canvas.toBuffer("image/png");
 }

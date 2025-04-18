@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	export let onUpdate: (bytes: string) => void;
+	export let onUpdate: (bytes_arr: Array<string>) => void;
 
 	import { createCanvas } from 'canvas';
 	import { pixelHeight, pixelWidth } from '$lib/consts';
@@ -8,13 +8,14 @@
 	import { closestColorIndex } from '$lib/colors/utils';
 
 	async function upload(){
-		console.log("upload");
-		const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+		const fileInput = document.getElementById('fileInput2') as HTMLInputElement;
+		console.log(fileInput.files);
 		if (fileInput.files && fileInput.files.length > 0) {
+			console.log("upload");
 			const file = fileInput.files[0];
 			const blob = new Blob([file], { type: file.type });
 
-			const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+			const canvas = document.getElementById('canvas2') as HTMLCanvasElement;
 			if (!canvas) {
 				console.error("Canvas not found");
 				return;
@@ -37,15 +38,37 @@
 					ctx.drawImage(img, 0, 0, img.width, img.height);
 					const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 					const data = imageData.data;
-					let bytes = "";
+
+					const nb_img_horizontal = Math.floor(canvas.width / pixelWidth);
+					const nb_img_vertical = Math.floor(canvas.height / pixelHeight);
+					const nb_img = nb_img_horizontal * nb_img_vertical;
+
+					let bytes = new Array(nb_img).fill("");
 
 					for (let i = 0; i < data.length; i += 4) {
+						const x = Math.floor(i / 4) % canvas.width;
+						const y = Math.floor(i / 4 / canvas.width);
+						const img_x = Math.floor(x / pixelWidth);
+						const img_y = Math.floor(y / pixelHeight);
+						const img_index = img_y * nb_img_horizontal + img_x;
+						if (img_index >= nb_img) {
+							continue;
+						}
+						if (bytes[img_index] === undefined) {
+							bytes[img_index] = "";
+						}
+						if (bytes[img_index].length >= pixelWidth * pixelHeight) {
+							continue;
+						}
+						// console.log("img_index", img_index);
+
 						const r = data[i];
 						const g = data[i + 1];
 						const b = data[i + 2];
 						const Colorindex = closestColorIndex([r, g, b]);
 
-						bytes += indexs[Colorindex];
+
+						bytes[img_index] += indexs[Colorindex];
 					}
 					onUpdate(bytes);
 				});
@@ -70,17 +93,17 @@
 </script>
 
 <form>
-	<input type="file" accept="image/*" id="fileInput" />
-	<button type="button" id="uploadButton" onclick={upload}>Upload</button>
+	<input type="file" accept="image/*" id="fileInput2" />
+	<button type="button" id="uploadButton2" onclick={upload}>Upload</button>
 
-	<canvas id="canvas" width={pixelWidth} height={pixelHeight}></canvas>
+	<canvas id="canvas2" width={pixelWidth} height={pixelHeight}></canvas>
 </form>
 
 <style>
-	#canvas {
+	#canvas2 {
 		border: 1px solid black;
 	}
-	#uploadButton {
+	#uploadButton2 {
 		margin-top: 10px;
 	}
 </style>

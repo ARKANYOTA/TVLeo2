@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { colors, eraserColor, indexs, pixelHeight, pixelSize, pixelWidth } from '$lib/consts';
 	import UploadImage from '$lib/UploadImage.svelte';
+	import UploadImagArr from '$lib/UploadImagArr.svelte';
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
@@ -14,11 +15,11 @@
 	let frames = $state(1);
 
 	// Crée un tableau de pixels
-	const pixels: number[][][] = [[]];
+	let pixels: number[][][] = [[]];
 	for (let i = 0; i < pixelHeight; i++) {
-		pixels[currentFrame][i] = [];
+		pixels[0][i] = [];
 		for (let j = 0; j < pixelWidth; j++) {
-			pixels[currentFrame][i][j] = 0;
+			pixels[0][i][j] = 0;
 		}
 	}
 
@@ -176,6 +177,27 @@
 		}
 		load_pixels();
 	}
+
+	function change_bytes_arr(bytes_arr: Array<string>) {
+		pixels = [[]];
+		frames = 0;
+		currentFrame = 0;
+
+		bytes_arr.forEach(bytes => {
+			// Crée un tableau de pixels
+			pixels[frames] = [];
+			for (let i = 0; i < pixelHeight; i++) {
+				pixels[frames][i] = [];
+				for (let j = 0; j < pixelWidth; j++) {
+					pixels[frames][i][j] = indexs.indexOf(bytes[i * pixelWidth + j]);
+				}
+			}
+			frames++;
+		});
+		currentFrame = frames - 1;
+
+		load_pixels();
+	}
 </script>
 
 <canvas id="main-canvas" width={pixelWidth * pixelSize} height={pixelHeight * pixelSize}>
@@ -226,7 +248,11 @@
 	<button onclick={new_frame}>New Frame</button>
   <button onclick={copy_frame}>copy current frame</button>
 
+<!--
 <UploadImage onUpdate={change_bytes}/>
+
+-->
+<UploadImagArr onUpdate={change_bytes_arr}/>
 
 <style>
 	canvas {
