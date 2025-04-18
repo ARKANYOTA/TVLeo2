@@ -7,10 +7,10 @@
 
 	let selectedColor = 1;
 
-	let brushSize = 1;
+	let brushSize = $state(1);
 
-	let currentFrame = 0;
-	let frames = 1;
+	let currentFrame = $state(0);
+	let frames = $state(1);
 
 	// Crée un tableau de pixels
 	const pixels: number[][][] = [[]];
