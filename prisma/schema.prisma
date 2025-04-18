@@ -1,0 +1,18 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+model Image {
+  id          String  @id @default(uuid())
+  bytes       String
+  name        String
+  description String
+  approved    Boolean @default(false)
+}
