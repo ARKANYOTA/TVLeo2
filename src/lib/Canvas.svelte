@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { colors, pixelHeight, pixelSize, pixelWidth, eraserColor, indexs } from "$lib/consts";
+	import UploadImage from '$lib/UploadImage.svelte';
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
@@ -166,6 +167,15 @@
 	function changeTool(e: Event) {
 		currentTool = (e.target as HTMLInputElement).value;
 	}
+
+	function change_bytes(bytes: string) {
+		for (let i = 0; i < pixelHeight; i++) {
+			for (let j = 0; j < pixelWidth; j++) {
+				pixels[currentFrame][i][j] = parseInt(bytes[i * pixelWidth + j]);
+			}
+		}
+		load_pixels();
+	}
 </script>
 
 <canvas id="main-canvas" width={pixelWidth * pixelSize} height={pixelHeight * pixelSize}>
@@ -215,6 +225,9 @@
 
 	<button onclick={new_frame}>New Frame</button>
   <button onclick={copy_frame}>copy current frame</button>
+
+<UploadImage onUpdate={change_bytes}/>
+
 <style>
 	canvas {
 		border: 1px solid black;
@@ -223,4 +236,5 @@
 	.selected {
 		background-color: #ccc;
 	}
+
 </style>
