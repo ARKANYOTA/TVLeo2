@@ -23,7 +23,11 @@ export const actions = {
 
 			if(password === ADMIN_PASSWORD){
 				cookies.set("admin_password", password, {
-					path: '/'
+					path: '/',
+					httpOnly: true, // assure-toi que ce cookie est sécurisé
+					secure: true,   // nécessaire en HTTPS
+					sameSite: 'None' // nécessaire si tu utilises des cookies cross-origin
+
 				})
 				return redirect(302, '/admin');
 				// return {success: true};
