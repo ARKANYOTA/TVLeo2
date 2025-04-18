@@ -51,7 +51,7 @@
 		}
 	}
 
-	let change_bytes_Component: any;
+	let change_bytes_Component: any = $state(undefined);
 
 	function change_bytes() {
 		// Force pour comprendre: https://stackoverflow.com/questions/58287729/how-can-i-export-a-function-from-a-svelte-component-that-changes-a-value-in-the

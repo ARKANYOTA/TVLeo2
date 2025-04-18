@@ -1,9 +1,17 @@
-version: '3'
 services:
-  svelte-app:
+  tvleo2:
     build: .
-    container_name: TVLeo2 
-    restart: unless-stopped
+    container_name: TVLeo2
+    ports:
+      - "3000:3000"  # Expose uniquement le port 3000 pour ton app
     expose:
       - "3000"
-
+# 
+        # services:
+        #   svelte-app:
+        #     build: .
+        #     container_name: TVLeo2 
+        #     restart: unless-stopped
+        #     expose:
+        #       - "3000"
+        # 
