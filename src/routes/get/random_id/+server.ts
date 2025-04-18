@@ -21,7 +21,7 @@ export async function GET(){
 
 	const { id, name, description, bytes } = image;
 
-	return new Response(JSON.stringify({id, frames: bytes.length}), {status: 200});
+	return new Response(JSON.stringify({id, name, description, frames: bytes.length}), {status: 200});
 
 	/*
 	const bytes = image.bytes;

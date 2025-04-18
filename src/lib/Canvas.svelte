@@ -62,27 +62,45 @@
 			// Click droit
 			ctx.fillStyle = colors[eraserColor];
 		}
-		if(brushSize === 1){
-			if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) return;
-			ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-			if(leftButton) {
+		if(currentTool === "brush"){
+			if(brushSize === 1){
+				if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) return;
+				ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+				if(leftButton) {
 
-				pixels[currentFrame][y][x] = selectedColor;
-			} else if (rightButton) {
-				pixels[currentFrame][y][x] = 0;
-			}
-		} else {
-			for (let i = -Math.floor(brushSize / 2); i <= Math.floor(brushSize / 2); i++) {
-				for (let j = -Math.floor(brushSize / 2); j <= Math.floor(brushSize / 2); j++) {
-					if(x + i < 0 || x + i >= pixelWidth || y + j < 0 || y + j >= pixelHeight) continue;
-					ctx.fillRect((x + i) * pixelSize, (y + j) * pixelSize, pixelSize, pixelSize);
-					if(leftButton) {
-						pixels[currentFrame][y+j][x+i] = selectedColor;
-					} else if (rightButton) {
-						pixels[currentFrame][y+j][x+i] = 0;
+					pixels[currentFrame][y][x] = selectedColor;
+				} else if (rightButton) {
+					pixels[currentFrame][y][x] = 0;
+				}
+			} else {
+				for (let i = -Math.floor(brushSize / 2); i <= Math.floor(brushSize / 2); i++) {
+					for (let j = -Math.floor(brushSize / 2); j <= Math.floor(brushSize / 2); j++) {
+						if(x + i < 0 || x + i >= pixelWidth || y + j < 0 || y + j >= pixelHeight) continue;
+						ctx.fillRect((x + i) * pixelSize, (y + j) * pixelSize, pixelSize, pixelSize);
+						if(leftButton) {
+							pixels[currentFrame][y+j][x+i] = selectedColor;
+						} else if (rightButton) {
+							pixels[currentFrame][y+j][x+i] = 0;
+						}
 					}
 				}
 			}
+		} else if (currentTool === "bucket"){
+			const get_current_color = pixels[currentFrame][y][x];
+			if (get_current_color === selectedColor) return;
+			const queue = [[x, y]];
+			while (queue.length > 0) {
+				const [x, y] = queue.pop()!;
+				if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) continue;
+				if (pixels[currentFrame][y][x] !== get_current_color) continue;
+				pixels[currentFrame][y][x] = selectedColor;
+				ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+				queue.push([x + 1, y]);
+				queue.push([x - 1, y]);
+				queue.push([x, y + 1]);
+				queue.push([x, y - 1]);
+			}
+
 		}
 		return;
 	};
@@ -118,7 +136,8 @@
 
 	});
 
-	function upload_image() {
+	function upload_image(e: Event) {
+		e.preventDefault()
 		let pixels_str = pixels.map(frame => frame.map(row => row.map(pixel => indexs[pixel]).join("")).join(""));
 		fetch("/new_image", {
 			method: "POST",
@@ -142,28 +161,51 @@
 		});
 		alert("Image uploaded");
 	}
+
+	let currentTool = $state("brush");
+	function changeTool(e: Event) {
+		currentTool = (e.target as HTMLInputElement).value;
+	}
 </script>
 
 <canvas id="main-canvas" width={pixelWidth * pixelSize} height={pixelHeight * pixelSize}>
 </canvas>
-<input type="range" min="1" max="10" value="1" class="slider" id="myRange">
-<button id="load_pixels" on:click={load_pixels}>Load Pixels</button>
+<button id="load_pixels" onclick={load_pixels}>Load Pixels</button>
 <div>
 	{#each colors as color, index}
-		<button on:click={() => selectedColor = index} style="background-color: {color}; width: 20px; height: 20px;">C</button>
+		<button onclick={() => selectedColor = index} style="background-color: {color}; width: 20px; height: 20px;">C</button>
 	{/each}
 </div>
-<form on:submit|preventDefault={upload_image}>
+<form onsubmit={upload_image}>
 		<input type="text" id="name" name="name" placeholder="Your name: (For credits)"/>
 		<input type="text" id="imgname" name="name" placeholder="Image Name: (For the database)"/>
 	<button type="submit">upload</button>
 </form>
-	<label for="brushSize">Brush Size:</label>
-	<input type="number" id="brushSize" bind:value={brushSize} min="1" max="10">
+
+<div class="tools">
+	<div class="current-tool">
+		<label>
+			<input checked={currentTool==="brush"} onchange={changeTool} type="radio" name="amount" value="brush" />
+		</label>
+		<label>
+			<input checked={currentTool==="bucket"} onchange={changeTool} type="radio" name="amount" value="bucket" />
+		</label>
+		Si tu veux effacer tu prend du blanc
+	</div>
+
+	{#if currentTool === "brush"}
+		<label for="brushSize">Brush Size:</label>
+		<input type="number" id="brushSize" bind:value={brushSize} min="1" max="10">
+
+		<p>Si tu veux un effaccer avec le brush c'est click droit</p>
+	{:else if currentTool === "bucket"}
+		<p>Bah y'a pas d'option c'est un bucket</p>
+	{/if}
+	</div>
 
 <br />
 {#each { length: frames } as _, i}
-	<button on:click={() => {
+	<button onclick={() => {
 		currentFrame = i;
 		load_pixels();
 	}}
@@ -171,8 +213,8 @@
 	>Frame {i}</button>
 {/each}
 
-	<button on:click={new_frame}>New Frame</button>
-  <button on:click={copy_frame}>copy current frame</button>
+	<button onclick={new_frame}>New Frame</button>
+  <button onclick={copy_frame}>copy current frame</button>
 <style>
 	canvas {
 		border: 1px solid black;

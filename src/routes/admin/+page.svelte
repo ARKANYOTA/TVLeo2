@@ -93,13 +93,30 @@
 		}
 	}
 
+	let selected: string = $state("all");
+
+	function onChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		if (target.checked) {
+			selected = target.value;
+		}
+	}
+
 </script>
 
 <div>
 	{#if isAdmin}
-		{frames}
-		<input type="checkbox" bind:checked={onlyApproved} id="onlyApproved">
-		<label for="onlyApproved">Only show approved</label>
+		<label>
+			<input checked={selected==="onlyApproved"} onchange={onChange} type="radio" name="amount" value="onlyApproved" /> Only Approved
+		</label>
+		<label>
+			<input checked={selected==="toApprove"} onchange={onChange} type="radio" name="amount" value="toApprove" /> To Approve
+		</label>
+		<label>
+			<input checked={selected==="all"} onchange={onChange} type="radio" name="amount" value="all" /> All
+		</label>
+
+
 
 		{#if onlyApproved}
 			<p>Only showing approved images</p>
@@ -109,19 +126,25 @@
 		{#if liste}
 			<ul>
 				{#each liste as img}
-					<li>
-						{#if selectedImage === img.id}
-						 	Selected image:
-						{/if}
-						{#if selectedImage !== img.id}
-							<button onclick={() => get_image(img.id)}>Get Image</button>
-						{/if}
-						{img.id} - {img.name} - {img.description} -
-						{#if !img.approved}
-							<button onclick={() => approve_image(img.id)}>A</button>
-						{/if}
-						<button onclick={() => delete_image(img.id)}>X</button>
-					</li>
+					{#if selected === "onlyApproved" && !img.approved}
+						<!-- Skip this image -->
+					{:else if selected === "toApprove" && img.approved}
+						<!-- Skip this image -->
+					{:else}
+						<li>
+							{#if selectedImage === img.id}
+								Selected image:
+							{/if}
+							{#if selectedImage !== img.id}
+								<button onclick={() => get_image(img.id)}>Get Image</button>
+							{/if}
+							{img.id} - {img.name} - {img.description} -
+							{#if !img.approved}
+								<button onclick={() => approve_image(img.id)}>A</button>
+							{/if}
+							<button onclick={() => delete_image(img.id)}>X</button>
+						</li>
+					{/if}
 				{/each}
 			</ul>
 		{:else}
@@ -133,6 +156,7 @@
 		<br/>
 
 		<RenderCanvas bind:this={change_bytes_Component} />
+		<br/>
 		{#each { length : frames } as _, i}
 			<button onclick={() => {
 				currentFrame = i;
