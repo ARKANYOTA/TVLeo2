@@ -13,5 +13,5 @@ RUN yarn install && yarn run build
 EXPOSE 3000
 
 # Lance le serveur SvelteKit (production)
-CMD ["yarn", "preview", "--port", "3000", "--host"]
+CMD ["yarn", "preview", "--port", "3000", "--host", "0.0.0.0"]
 
