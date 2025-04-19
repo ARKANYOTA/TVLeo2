@@ -53,26 +53,16 @@
 
 	function drawListener(e: MouseEvent) {
 		const leftButton = e.type === "mousemove" ? e.buttons === 1 : e.button === 0;
-		const rightButton = e.type === "mousemove" ? e.buttons === 2 : e.button === 2;
-		if(!leftButton && !rightButton) return; // Only draw when mouse is pressed
+		if(!leftButton) return; // Only draw when mouse is pressed
 		const x = Math.floor(e.offsetX / pixelSize);
 		const y = Math.floor(e.offsetY / pixelSize);
-		if(leftButton) {
-			// Click gauche
-			ctx.fillStyle = colors[selectedColor];
-		} else if (rightButton) {
-			// Click droit
-			ctx.fillStyle = colors[eraserColor];
-		}
+		ctx.fillStyle = colors[selectedColor];
 		if(currentTool === "brush"){
 			if(brushSize === 1){
 				if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) return;
 				ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
 				if(leftButton) {
-
 					pixels[currentFrame][y][x] = selectedColor;
-				} else if (rightButton) {
-					pixels[currentFrame][y][x] = 0;
 				}
 			} else {
 				for (let i = -Math.floor(brushSize / 2); i <= Math.floor(brushSize / 2); i++) {
@@ -81,8 +71,6 @@
 						ctx.fillRect((x + i) * pixelSize, (y + j) * pixelSize, pixelSize, pixelSize);
 						if(leftButton) {
 							pixels[currentFrame][y+j][x+i] = selectedColor;
-						} else if (rightButton) {
-							pixels[currentFrame][y+j][x+i] = 0;
 						}
 					}
 				}
@@ -102,7 +90,6 @@
 				queue.push([x, y + 1]);
 				queue.push([x, y - 1]);
 			}
-
 		}
 		return;
 	};
@@ -118,12 +105,109 @@
 		}
 	}
 
+	let isDrawing = false;
+	let lastX = 0;
+	let lastY = 0;
+
+	function getMousePos(e) {
+		const rect = canvas.getBoundingClientRect();
+		const x = Math.floor((e.clientX - rect.left) / pixelSize);
+		const y = Math.floor((e.clientY - rect.top) / pixelSize);
+		return [x, y];
+	}
+
+	function getTouchPos(e) {
+		const rect = canvas.getBoundingClientRect();
+		const touch = e.touches[0]; // Premier doigt
+		const x = Math.floor((touch.clientX - rect.left) / pixelSize);
+		const y = Math.floor((touch.clientY - rect.top) / pixelSize);
+		return [x, y];
+	}
+
+	function drawPixel(x: number, y: number) {
+		if (x < 0 || x >= pixelWidth || y < 0 || y >= pixelHeight) return;
+		ctx.fillStyle = colors[selectedColor];
+		ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+		pixels[currentFrame][y][x] = selectedColor;
+	}
+
+	function drawLine(x1: number, y1: number, x2: number, y2: number) {
+		const dx = Math.abs(x2 - x1);
+		const dy = Math.abs(y2 - y1);
+		const sx = (x1 < x2) ? 1 : -1;
+		const sy = (y1 < y2) ? 1 : -1;
+		let err = dx - dy;
+
+		while (true) {
+			drawPixel(x1, y1);
+			if (x1 === x2 && y1 === y2) break;
+			const err2 = err * 2;
+			if (err2 > -dy) {
+				err -= dy;
+				x1 += sx;
+			}
+			if (err2 < dx) {
+				err += dx;
+				y1 += sy;
+			}
+		}
+	}
+
 	onMount(() => {
 		canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
 		ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-		canvas.addEventListener('mousemove', drawListener);
-		canvas.addEventListener('mousedown', drawListener);
+		canvas.addEventListener("mouseout", () => {
+			isDrawing = false;
+		});
+
+		canvas.addEventListener("mouseenter", (e) => {
+			if(e.buttons === 1) {
+				isDrawing = true;
+			}
+		});
+
+		canvas.addEventListener('mousemove', (e) => {
+			drawListener(e);
+			if (!isDrawing) return;
+			if (e.buttons !== 1) return;
+			const [x, y] = getMousePos(e);
+			drawLine(lastX, lastY, x, y, );
+			[lastX, lastY] = [x, y];
+		});
+
+		canvas.addEventListener('mousedown', (e) => {
+			drawListener(e);
+			const [x, y] = getMousePos(e);
+			isDrawing = true;
+			[lastX, lastY] = [x, y];
+		});
+
+		canvas.addEventListener("mouseup", () => {
+			isDrawing = false;
+		});
+
+		canvas.addEventListener("touchstart", (e) => {
+			e.preventDefault(); // Empêche le défilement mobile
+			isDrawing = true;
+			const [x, y] = getTouchPos(e);
+
+			drawPixel(x, y);
+		});
+
+		canvas.addEventListener("touchmove", (e) => {
+			if (!isDrawing) return;
+			e.preventDefault(); // Empêche le défilement mobile
+			const [x, y] = getTouchPos(e);
+			drawLine(lastX, lastY, x, y);
+			[lastX, lastY] = [x, y];
+		});
+
+		canvas.addEventListener("touchend", () => {
+			isDrawing = false;
+		});
+
+
 
 		// Desactiver le click gauche (du navigateur)
 		canvas.addEventListener("contextmenu", (e) => {
@@ -136,7 +220,41 @@
 		});
 
 
+			// Variables pour savoir si on dessine
+
+			canvas.addEventListener("mousemove", (e) => {
+				if (!isDrawing) return;
+			});
+
+			canvas.addEventListener("mouseup", () => {
+				isDrawing = false;
+			});
+
+			// Ajouter touch events pour mobile
+			canvas.addEventListener("touchstart", (e) => {
+				e.preventDefault(); // Empêche le défilement mobile
+				isDrawing = true;
+				const [x, y] = getTouchPos(e);
+				drawPixel(x, y);
+			});
+
+			canvas.addEventListener("touchmove", (e) => {
+				if (!isDrawing) return;
+				e.preventDefault(); // Empêche le défilement mobile
+				const [x, y] = getTouchPos(e);
+				drawLine(lastX, lastY, x, y);
+				[lastX, lastY] = [x, y];
+			});
+
+			canvas.addEventListener("touchend", () => {
+				isDrawing = false;
+			});
+
+
+
 	});
+
+
 
 	function upload_image(e: Event) {
 		e.preventDefault()

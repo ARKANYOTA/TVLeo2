@@ -34,3 +34,7 @@ yarn run dev
 npx prisma studio
 ```
 Ouais des images !
+
+
+# Depedences:
+https://www.npmjs.com/package/canvas
