@@ -18,7 +18,7 @@ export const handle = async ({ event, resolve }: {event: eventInterface, resolve
 
 	event.locals.admin = false;
 
-	if ( event.url.pathname !== '/' && event.url.pathname !== '/login') {
+	if (!event.url.pathname.startsWith("/admin")) {
 		return redirect(302, '/login');
 	}
 	return resolve(event);
