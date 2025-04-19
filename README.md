@@ -1,38 +1,36 @@
-# sv
+## Setup
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
+### Instralation du projet
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+git clone ...
+cd ... 
+yarn install
 ```
 
-## Developing
+### Postgress
+Installer postgresql
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+Créer une base de donnée:
+```bash 
+createdb -h localhost -p 5432 -U <Votre nom d'ulitisateur> tvleo 
 ```
 
-## Building
+### Env
+copier le .env.example en .env et remplir les champs  
+surtour le DATABASE_URL  
 
-To create a production version of your app:
-
+### Setup Prisma 
 ```bash
-npm run build
+yarn prisma migrate dev
 ```
 
-You can preview the production build with `npm run preview`.
+## Developpement
+```bash
+yarn run dev
+```
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Acceder a la base de données
+```bash
+npx prisma studio
+```
+Ouais des images !
