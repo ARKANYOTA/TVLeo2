@@ -195,13 +195,18 @@
 			drawPixel(x, y);
 		});
 
+
 		canvas.addEventListener("touchmove", (e) => {
-			if (!isDrawing) return;
 			e.preventDefault(); // Empêche le défilement mobile
-			const [x, y] = getTouchPos(e);
-			drawLine(lastX, lastY, x, y);
-			[lastX, lastY] = [x, y];
 		});
+
+		// canvas.addEventListener("touchmove", (e) => {
+		// 	if (!isDrawing) return;
+		// 	e.preventDefault(); // Empêche le défilement mobile
+		// 	const [x, y] = getTouchPos(e);
+		// 	drawLine(lastX, lastY, x, y);
+		// 	[lastX, lastY] = [x, y];
+		// });
 
 		canvas.addEventListener("touchend", () => {
 			isDrawing = false;
